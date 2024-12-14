@@ -67,9 +67,12 @@ int Player::compare (const Player &other, int c) const
 		if (v != 0)
 			return v;
 	}
-	if (c == 2)
-		return sort_rk.compare (other.sort_rk);
-	else
+	if (c == 2) {
+		int v = sort_rk.compare (other.sort_rk);
+		if (v != 0)
+			return v;
+		return name.compare (other.name);
+	} else
 		return column (c).compare (other.column (c));
 }
 
