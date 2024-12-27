@@ -241,6 +241,11 @@
 			      <string>BC</string>
 			    </property>
 			  </item>
+			  <item>
+			    <property name="text">
+			      <string>NR</string>
+			    </property>
+			  </item>
 			</widget>
 		      </item>
 		      <item>
