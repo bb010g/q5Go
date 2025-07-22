@@ -98,7 +98,7 @@ void table_model<T>::update_from_map (const std::unordered_map<QString, T> &m)
 {
 	std::vector<T> new_entries;
 	for (auto &it: m)
-		if (!m_filter (it.second))
+		if (m_filter (it.second))
 			new_entries.push_back (it.second);
 	std::sort (std::begin (new_entries), std::end (new_entries),
 		   [this] (const T &a, const T &b) { return sort_compare (a, b) < 0; });
@@ -469,7 +469,7 @@ void ClientWindow::server_add_player (const Player &p_in, bool cmdplayers)
 		mark = "M";
 	}
 	p.mark = mark;
-	p.sort_rk = rkToKey (p.rank) + p.name.toLower ();
+	p.sort_rk = rkToKey (p.rank);
 
 	m_player_table[p.name] = p;
 }
@@ -502,20 +502,26 @@ void ClientWindow::update_who_rank (QComboBox *box, int idx)
 
 bool ClientWindow::filter_game (const Game &)
 {
-	return false;
+	return true;
 }
 
 bool ClientWindow::filter_player (const Player &p)
 {
 	if (m_online_server == IGS && m_whoopen) {
 		if (p.info.contains ('X') || !p.play_str.contains ('-'))
-			return true;
+			return false;
 	}
 	/* Rank comparisons are inverted: pro rank keys start with "a",
 	   dan ranks with "b", kyu with "c".  */
-	if (p.sort_rk > m_who1_rk || p.sort_rk < m_who2_rk)
-		return true;
-	return false;
+	if (m_who1_rk < p.sort_rk) {
+		// qDebug () << "filtering low player " << m_who1_rk << " < " << p.sort_rk << " (" << p.rank << ")";
+		return false;
+	}
+	if (p.sort_rk < m_who2_rk) {
+		// qDebug () << "filtering high player " << p.sort_rk << "(" << p.rank << ") < " << m_who2_rk;
+		return false;
+	}
+	return true;
 }
 
 // get channelinfo: ch nr + people
